@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>私たちの中華大迷宮</title>
+  <style>
+    :root{
+      --bg:#fff8eb;
+      --ink:#271b18;
+      --line:#5b3a35;
+      --pink:#f58aa2;
+      --red:#f36b6c;
+      --mint:#98d9b7;
+      --blue:#8fd1df;
+      --orange:#f6aa5d;
+      --yellow:#f7d96f;
+      --purple:#caa0de;
+      --cream:#fff4d9;
+      --button:#f27786;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      background:
+        radial-gradient(circle at 12% 18%, rgba(245,138,162,.16), transparent 11%),
+        radial-gradient(circle at 90% 22%, rgba(245,138,162,.13), transparent 13%),
+        radial-gradient(circle at 10% 84%, rgba(245,138,162,.12), transparent 12%),
+        radial-gradient(circle at 86% 86%, rgba(245,138,162,.12), transparent 14%),
+        var(--bg);
+      color:var(--ink);
+      font-family:"Arial Rounded MT Bold","Hiragino Maru Gothic ProN","Yu Gothic","Noto Sans JP",system-ui,sans-serif;
+    }
+
+    .app{
+      width:min(900px,96vw);
+      margin:20px auto;
+      padding:22px;
+      text-align:center;
+    }
+
+    h1{
+      margin:0 0 8px;
+      font-size:clamp(34px,6vw,64px);
+      line-height:1.08;
+      letter-spacing:.04em;
+      font-weight:900;
+      color:#f07186;
+      text-shadow:
+        2px 2px 0 #fff,
+        4px 4px 0 rgba(91,58,53,.13);
+    }
+
+    .lead{
+      display:inline-block;
+      margin:8px 0 20px;
+      padding:10px 18px;
+      border-radius:999px;
+      background:#fff;
+      border:3px solid rgba(91,58,53,.18);
+      color:#6f4a44;
+      font-weight:900;
+      font-size:15px;
+    }
+
+    .wheelArea{
+      width:min(660px,92vw);
+      margin:0 auto;
+      position:relative;
+      display:grid;
+      place-items:center;
+    }
+
+    .pointer{
+      position:absolute;
+      top:18px;
+      left:50%;
+      transform:translateX(-50%);
+      z-index:5;
+      width:0;
+      height:0;
+      border-left:22px solid transparent;
+      border-right:22px solid transparent;
+      border-top:48px solid #f4a0ae;
+      filter:drop-shadow(0 3px 0 rgba(91,58,53,.55));
+    }
+
+    canvas{
+      width:100%;
+      aspect-ratio:1;
+      display:block;
+    }
+
+    .spin{
+      margin-top:14px;
+      width:min(460px,88vw);
+      border:4px solid var(--line);
+      border-radius:999px;
+      background:#f4899a;
+      color:#fff;
+      padding:17px 20px;
+      font-size:clamp(20px,4vw,32px);
+      font-weight:900;
+      letter-spacing:.04em;
+      cursor:pointer;
+      box-shadow:0 8px 0 #5b3a35;
+      transition:.12s transform,.12s box-shadow;
+    }
+
+    .spin:active{
+      transform:translateY(6px);
+      box-shadow:0 2px 0 #5b3a35;
+    }
+
+    .spin:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+    }
+
+    .resultBox{
+      width:min(540px,90vw);
+      margin:18px auto 0;
+      background:#fff;
+      border:4px solid rgba(91,58,53,.55);
+      border-radius:24px;
+      overflow:hidden;
+      box-shadow:0 8px 0 rgba(91,58,53,.12);
+    }
+
+    .resultLabel{
+      display:inline-block;
+      transform:translateY(-1px);
+      padding:6px 26px;
+      background:#f4899a;
+      color:#fff;
+      border:3px solid rgba(91,58,53,.55);
+      border-top:0;
+      border-radius:0 0 14px 14px;
+      font-weight:900;
+      letter-spacing:.12em;
+    }
+
+    #result{
+      min-height:74px;
+      display:grid;
+      place-items:center;
+      padding:10px 18px 24px;
+      font-size:clamp(22px,4vw,34px);
+      font-weight:900;
+    }
+
+    .buttons{
+      width:min(620px,92vw);
+      margin:18px auto 0;
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:12px;
+    }
+
+    .buttons button{
+      border:3px solid rgba(91,58,53,.45);
+      border-radius:18px;
+      padding:13px 10px;
+      background:#fff2c4;
+      color:#4a302c;
+      font-weight:900;
+      cursor:pointer;
+      min-height:58px;
+    }
+
+    .buttons .primary{
+      background:#f4899a;
+      color:#fff;
+    }
+
+    details{
+      width:min(620px,92vw);
+      margin:16px auto 0;
+      text-align:left;
+      background:#fff;
+      border:3px solid rgba(91,58,53,.25);
+      border-radius:18px;
+      padding:12px 16px;
+    }
+
+    summary{
+      cursor:pointer;
+      font-weight:900;
+      color:#6b4540;
+    }
+
+    textarea{
+      width:100%;
+      height:150px;
+      margin-top:12px;
+      resize:vertical;
+      border:3px solid rgba(91,58,53,.22);
+      border-radius:14px;
+      padding:12px;
+      font:700 16px/1.6 "Hiragino Maru Gothic ProN","Yu Gothic",system-ui,sans-serif;
+      background:#fffdf7;
+      color:#271b18;
+    }
+
+    .note{
+      margin-top:14px;
+      color:#8a625b;
+      font-size:13px;
+      font-weight:700;
+    }
+
+    @media(max-width:720px){
+      .buttons{grid-template-columns:1fr}
+      .app{padding:14px}
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <h1>私たちの中華大迷宮</h1>
+    <div class="lead">どこに行くかは、神に任せましょう</div>
+
+    <section class="wheelArea">
+      <div class="pointer"></div>
+      <canvas id="wheel" width="1000" height="1000"></canvas>
+    </section>
+
+    <button id="spin" class="spin">ルーレットを回す！</button>
+
+    <section class="resultBox">
+      <div class="resultLabel">結果</div>
+      <div id="result">まだ回していません</div>
+    </section>
+
+    <section class="buttons">
+      <button id="shareResult" class="primary">結果入りURLをコピー</button>
+      <button id="shareItems">候補入りURLをコピー</button>
+      <button id="reset">リセット</button>
+    </section>
+
+    <details>
+      <summary>候補を編集する</summary>
+      <textarea id="items">胖鴨
+人間煙火焼烤屋
+南粤美食
+美人酒家</textarea>
+    </details>
+
+    <div class="note">共有URLを開くと、相手にも同じ候補・同じ結果が表示されます。</div>
+  </main>
+
+  <script>
+    const canvas = document.getElementById("wheel");
+    const ctx = canvas.getContext("2d");
+    const textarea = document.getElementById("items");
+    const resultEl = document.getElementById("result");
+    const spinBtn = document.getElementById("spin");
+    const shareResultBtn = document.getElementById("shareResult");
+    const shareItemsBtn = document.getElementById("shareItems");
+    const resetBtn = document.getElementById("reset");
+
+    const colors = ["#f7d96f","#98d9b7","#f6aa5d","#f36b6c","#8fd1df","#caa0de","#f7a8ba","#f27070","#96d7b2","#8fd1df","#f6aa5d","#caa0de"];
+
+    let rotation = 0;
+    let spinning = false;
+    let lastResult = "";
+    let lastIndex = null;
+
+    function getItems(){
+      return textarea.value.split("\n").map(v => v.trim()).filter(Boolean);
+    }
+
+    function draw(){
+      const items = getItems();
+      const size = canvas.width;
+      const c = size / 2;
+      const outer = 430;
+      const inner = 170;
+
+      ctx.clearRect(0,0,size,size);
+      ctx.save();
+      ctx.translate(c,c);
+
+      drawScallop(455, 38);
+
+      ctx.save();
+      ctx.rotate(rotation);
+
+      if(items.length){
+        const arc = Math.PI * 2 / items.length;
+
+        items.forEach((item, i) => {
+          const start = -Math.PI / 2 + i * arc;
+          const end = start + arc;
+
+          ctx.beginPath();
+          ctx.arc(0,0,outer,start,end);
+          ctx.arc(0,0,inner,end,start,true);
+          ctx.closePath();
+          ctx.fillStyle = colors[i % colors.length];
+          ctx.fill();
+          ctx.strokeStyle = "rgba(255,255,255,.86)";
+          ctx.lineWidth = 5;
+          ctx.stroke();
+
+          ctx.save();
+          ctx.rotate(start + arc / 2);
+          ctx.translate((outer + inner) / 2, 0);
+          ctx.rotate(Math.PI / 2);
+          ctx.fillStyle = "#111";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.font = `900 ${items.length > 11 ? 30 : 36}px "Arial Rounded MT Bold","Hiragino Maru Gothic ProN","Yu Gothic",sans-serif`;
+          wrapText(item, 0, 0, 150, 36);
+          ctx.restore();
+        });
+      }
+
+      ctx.restore();
+
+      ctx.beginPath();
+      ctx.arc(0,0,inner - 2,0,Math.PI*2);
+      ctx.fillStyle = "#fff4d9";
+      ctx.fill();
+      ctx.strokeStyle = "#5b3a35";
+      ctx.lineWidth = 7;
+      ctx.stroke();
+
+      drawSpiral();
+
+      ctx.restore();
+    }
+
+    function drawScallop(radius, bumps){
+      ctx.save();
+      ctx.beginPath();
+      for(let i=0;i<=bumps*2;i++){
+        const a = i / (bumps*2) * Math.PI * 2;
+        const r = radius + (i % 2 === 0 ? 12 : -8);
+        const x = Math.cos(a) * r;
+        const y = Math.sin(a) * r;
+        if(i === 0) ctx.moveTo(x,y);
+        else ctx.lineTo(x,y);
+      }
+      ctx.closePath();
+      ctx.fillStyle = "#fff1d2";
+      ctx.fill();
+      ctx.strokeStyle = "#5b3a35";
+      ctx.lineWidth = 6;
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawSpiral(){
+      ctx.save();
+      ctx.strokeStyle = "#f4899a";
+      ctx.lineWidth = 18;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      for(let t=0;t<Math.PI*5.2;t+=0.08){
+        const r = 6 + t * 10;
+        const x = Math.cos(t) * r;
+        const y = Math.sin(t) * r;
+        if(t === 0) ctx.moveTo(x,y);
+        else ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function wrapText(text, x, y, maxWidth, lineHeight){
+      const chars = [...text];
+      const lines = [];
+      let line = "";
+
+      for(const ch of chars){
+        const test = line + ch;
+        if(ctx.measureText(test).width > maxWidth && line){
+          lines.push(line);
+          line = ch;
+        }else{
+          line = test;
+        }
+      }
+      lines.push(line);
+
+      const startY = y - (lines.length - 1) * lineHeight / 2;
+      lines.forEach((line, i) => ctx.fillText(line, x, startY + i * lineHeight));
+    }
+
+    function spin(){
+      const items = getItems();
+      if(items.length < 2 || spinning) return;
+
+      spinning = true;
+      spinBtn.disabled = true;
+      resultEl.textContent = "抽選中……";
+
+      const chosen = Math.floor(Math.random() * items.length);
+      const arc = Math.PI * 2 / items.length;
+
+      /*
+        針は画面上の真上。
+        セグメントchosenの中央が真上に来る回転角を先に計算する。
+        これで「表示結果」と「針の位置」が必ず一致する。
+      */
+      const segmentCenter = -Math.PI / 2 + chosen * arc + arc / 2;
+      const finalRotation = -Math.PI / 2 - segmentCenter;
+      const fullTurns = Math.PI * 2 * (6 + Math.floor(Math.random() * 4));
+
+      const startRot = rotation;
+      const targetRot = finalRotation + fullTurns;
+      const duration = 4200;
+      const startTime = performance.now();
+
+      function easeOutCubic(t){
+        return 1 - Math.pow(1 - t, 3);
+      }
+
+      function animate(now){
+        const p = Math.min(1, (now - startTime) / duration);
+        rotation = startRot + (targetRot - startRot) * easeOutCubic(p);
+        draw();
+
+        if(p < 1){
+          requestAnimationFrame(animate);
+        }else{
+          rotation = finalRotation;
+          lastIndex = chosen;
+          lastResult = items[chosen];
+          resultEl.textContent = `決定：${lastResult}`;
+          spinning = false;
+          spinBtn.disabled = false;
+          draw();
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    function encodeItems(items){
+      return items.map(encodeURIComponent).join("|");
+    }
+
+    function decodeSafe(v){
+      try{return decodeURIComponent(v)}catch(e){return v}
+    }
+
+    async function copyText(text){
+      try{
+        await navigator.clipboard.writeText(text);
+      }catch(e){
+        const t = document.createElement("textarea");
+        t.value = text;
+        document.body.appendChild(t);
+        t.select();
+        document.execCommand("copy");
+        t.remove();
+      }
+    }
+
+    async function share(withResult){
+      const params = new URLSearchParams();
+      params.set("items", encodeItems(getItems()));
+
+      if(withResult){
+        if(!lastResult){
+          resultEl.textContent = "先にルーレットを回してね";
+          return;
+        }
+        params.set("result", lastResult);
+        if(lastIndex !== null) params.set("index", String(lastIndex));
+      }
+
+      const url = `${location.origin}${location.pathname}?${params.toString()}`;
+      await copyText(url);
+
+      const btn = withResult ? shareResultBtn : shareItemsBtn;
+      const old = btn.textContent;
+      btn.textContent = "コピーしました！";
+      setTimeout(() => btn.textContent = old, 1200);
+    }
+
+    function loadFromUrl(){
+      const params = new URLSearchParams(location.search);
+      const itemsParam = params.get("items");
+      const resultParam = params.get("result");
+      const indexParam = params.get("index");
+
+      if(itemsParam){
+        textarea.value = itemsParam.split("|").map(decodeSafe).join("\n");
+      }
+
+      const items = getItems();
+
+      if(resultParam){
+        lastResult = resultParam;
+        resultEl.textContent = `決定：${lastResult}`;
+
+        const idxFromUrl = indexParam !== null ? Number(indexParam) : items.indexOf(lastResult);
+        if(Number.isInteger(idxFromUrl) && idxFromUrl >= 0 && idxFromUrl < items.length){
+          lastIndex = idxFromUrl;
+          const arc = Math.PI * 2 / items.length;
+          const segmentCenter = -Math.PI / 2 + lastIndex * arc + arc / 2;
+          rotation = -Math.PI / 2 - segmentCenter;
+        }
+      }
+    }
+
+    function reset(){
+      lastResult = "";
+      lastIndex = null;
+      rotation = 0;
+      resultEl.textContent = "まだ回していません";
+      history.replaceState(null, "", location.pathname);
+      draw();
+    }
+
+    spinBtn.addEventListener("click", spin);
+    shareResultBtn.addEventListener("click", () => share(true));
+    shareItemsBtn.addEventListener("click", () => share(false));
+    resetBtn.addEventListener("click", reset);
+    textarea.addEventListener("input", () => {
+      lastResult = "";
+      lastIndex = null;
+      resultEl.textContent = "まだ回していません";
+      draw();
+    });
+
+    loadFromUrl();
+    draw();
+  </script>
+</body>
+</html>
