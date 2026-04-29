@@ -214,6 +214,68 @@
       font-weight:700;
     }
 
+
+    body.shareMode .lead,
+    body.shareMode details,
+    body.shareMode .buttons,
+    body.shareMode .spin{
+      display:none;
+    }
+
+    body.shareMode .app{
+      min-height:100vh;
+      display:grid;
+      align-content:center;
+    }
+
+    body.shareMode h1{
+      font-size:clamp(34px,7vw,72px);
+      margin-bottom:28px;
+    }
+
+    body.shareMode .wheelArea{
+      transform:scale(.86);
+      margin-top:-10px;
+      margin-bottom:-28px;
+      opacity:.72;
+    }
+
+    body.shareMode .resultBox{
+      margin-top:8px;
+      border-width:5px;
+      box-shadow:0 12px 0 rgba(91,58,53,.13);
+    }
+
+    body.shareMode #result{
+      min-height:132px;
+      font-size:clamp(26px,6vw,52px);
+      line-height:1.35;
+      color:#271b18;
+    }
+
+    .shareReveal{
+      animation:popReveal .62s ease both;
+    }
+
+    .shareSmall{
+      display:block;
+      margin-bottom:8px;
+      color:#8a625b;
+      font-size:clamp(16px,3vw,22px);
+      letter-spacing:.08em;
+    }
+
+    .shareMain{
+      display:block;
+      color:#f07186;
+      text-shadow:2px 2px 0 #fff, 4px 4px 0 rgba(91,58,53,.13);
+    }
+
+    @keyframes popReveal{
+      0%{opacity:0; transform:translateY(12px) scale(.96);}
+      100%{opacity:1; transform:translateY(0) scale(1);}
+    }
+
     @media(max-width:720px){
       .buttons{grid-template-columns:1fr}
       .app{padding:14px}
@@ -223,7 +285,7 @@
 <body>
   <main class="app">
     <h1>私たちの中華大迷宮</h1>
-    <div class="lead">どこに行くかは、神に任せましょう</div>
+    <div class="lead">どこに行くかは、ルーレットにまかせよう</div>
 
     <section class="wheelArea">
       <div class="pointer"></div>
@@ -451,6 +513,15 @@
       try{return decodeURIComponent(v)}catch(e){return v}
     }
 
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
     async function copyText(text){
       try{
         await navigator.clipboard.writeText(text);
@@ -474,6 +545,7 @@
           return;
         }
         params.set("result", lastResult);
+        params.set("share", "1");
         if(lastIndex !== null) params.set("index", String(lastIndex));
       }
 
@@ -500,7 +572,17 @@
 
       if(resultParam){
         lastResult = resultParam;
-        resultEl.textContent = `決定：${lastResult}`;
+
+        const isShareMode = params.get("share") === "1";
+        if(isShareMode){
+          document.body.classList.add("shareMode");
+          resultEl.textContent = "……";
+          setTimeout(() => {
+            resultEl.innerHTML = `<span class="shareReveal"><span class="shareSmall">今宵の一皿は——</span><span class="shareMain">${escapeHtml(lastResult)}</span></span>`;
+          }, 850);
+        }else{
+          resultEl.textContent = `決定：${lastResult}`;
+        }
 
         const idxFromUrl = indexParam !== null ? Number(indexParam) : items.indexOf(lastResult);
         if(Number.isInteger(idxFromUrl) && idxFromUrl >= 0 && idxFromUrl < items.length){
