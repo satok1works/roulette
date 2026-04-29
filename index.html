@@ -155,10 +155,10 @@
     }
 
     .buttons{
-      width:min(620px,92vw);
+      width:min(420px,92vw);
       margin:18px auto 0;
       display:grid;
-      grid-template-columns:1fr 1fr 1fr;
+      grid-template-columns:1fr;
       gap:12px;
     }
 
@@ -276,6 +276,12 @@
       100%{opacity:1; transform:translateY(0) scale(1);}
     }
 
+
+    .buttons{
+      width:min(420px,92vw);
+      grid-template-columns:1fr;
+    }
+
     @media(max-width:720px){
       .buttons{grid-template-columns:1fr}
       .app{padding:14px}
@@ -285,7 +291,7 @@
 <body>
   <main class="app">
     <h1>私たちの中華大迷宮</h1>
-    <div class="lead">どこに行くかは、ルーレットにまかせよう</div>
+    <div class="lead">神に任せましょう。</div>
 
     <section class="wheelArea">
       <div class="pointer"></div>
@@ -301,19 +307,9 @@
 
     <section class="buttons">
       <button id="shareResult" class="primary">結果入りURLをコピー</button>
-      <button id="shareItems">候補入りURLをコピー</button>
-      <button id="reset">リセット</button>
+
     </section>
-
-    <details>
-      <summary>候補を編集する</summary>
-      <textarea id="items">胖鴨
-人間煙火焼烤屋
-南粤美食
-美人酒家</textarea>
-    </details>
-
-    <div class="note">共有URLを開くと、相手にも同じ候補・同じ結果が表示されます。</div>
+<div class="note">ルーレットを回したら、結果入りURLをシェアしてね！</div>
   </main>
 
   <script>
@@ -605,8 +601,8 @@
 
     spinBtn.addEventListener("click", spin);
     shareResultBtn.addEventListener("click", () => share(true));
-    shareItemsBtn.addEventListener("click", () => share(false));
-    resetBtn.addEventListener("click", reset);
+    if(shareItemsBtn) shareItemsBtn.addEventListener("click", () => share(false));
+    if(resetBtn) resetBtn.addEventListener("click", reset);
     textarea.addEventListener("input", () => {
       lastResult = "";
       lastIndex = null;
